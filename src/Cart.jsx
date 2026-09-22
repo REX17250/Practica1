@@ -1,6 +1,9 @@
-function Cart({ items, total, onQty, onRemove, onCheckout }) {
+function Cart({ items, total, onQty, onRemove, onCheckout, onClose }) {
   return (
     <aside className="cart">
+      <button className="cart-close" aria-label="Cerrar carrito" onClick={onClose}>
+        x
+      </button>
       <h2>Tu carrito</h2>
 
       {items.length === 0 && <p>El carrito está vacío.</p>}

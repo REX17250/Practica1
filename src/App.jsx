@@ -29,19 +29,31 @@ function App() {
   }, [search])
 
   function addToCart(product) {
-    cart.push({ ...product, quantity: 1 })
-    setCart(cart)
+    const existing = cart.find((item) => item.id === product.id)
+    if (existing) {
+      setCart(
+        cart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
+            : item
+        )
+      )
+    } else {
+      setCart([...cart, { ...product, quantity: 1 }])
+    }
   }
 
   function changeQty(index, delta) {
     const updated = cart.map((item, i) =>
-      i === index ? { ...item, quantity: item.quantity + delta } : item
+      i === index
+        ? { ...item, quantity: Math.min(item.quantity + delta, item.stock) }
+        : item
     )
     setCart(updated)
   }
 
   function removeFromCart(item) {
-    setCart(cart.filter((c) => c.category !== item.category))
+    setCart(cart.filter((c) => c.id !== item.id))
   }
 
   function checkout() {
@@ -50,13 +62,14 @@ function App() {
   }
 
   const total = cart.reduce(
-    (sum, item) => sum + (item.price - item.discountPercentage) * item.quantity,
+    (sum, item) =>
+      sum + item.price * (1 - item.discountPercentage / 100) * item.quantity,
     0
   )
 
   const visibleProducts = products
     .filter((p) => category === 'all' || p.category === category)
-    .filter((p) => p.title.includes(search))
+    .filter((p) => p.title.toLowerCase().includes(search.toLowerCase()))
 
   return (
     <div className="app">
@@ -106,6 +119,7 @@ function App() {
           onQty={changeQty}
           onRemove={removeFromCart}
           onCheckout={checkout}
+          onClose={() => setShowCart(false)}
         />
       )}
     </div>
