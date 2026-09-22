@@ -46,7 +46,7 @@ function App() {
   function changeQty(index, delta) {
     const updated = cart.map((item, i) =>
       i === index
-        ? { ...item, quantity: Math.min(item.quantity + delta, item.stock) }
+        ? { ...item, quantity: Math.max(1, Math.min(item.quantity + delta, item.stock)) }
         : item
     )
     setCart(updated)
